@@ -10,6 +10,7 @@ public class Payment : MonoBehaviour {
 	public Text  payment;
 	public Text name;
 	public Text email;
+	public Text coinCount;
 	public Button pleaseWaitButton;
 	public Text pleaseWaitText;
 	public void payPal(){
@@ -20,33 +21,39 @@ public class Payment : MonoBehaviour {
 	{
 		pleaseWaitText.text = "Please wait...";
 		float pay;
-		print (float.Parse(payment.text)+email.text);
-		if (float.TryParse (payment.text, out pay) && (email.text != null)) {
-			
-			WWWForm form = new WWWForm ();
-			form.AddField ("name", name.text);
-			form.AddField ("email", email.text);
-			form.AddField ("reqAmount", pay + "");
-			form.AddField ("payType", "paypal");
+		float amount;
+		if (float.TryParse (payment.text, out pay) && float.TryParse (coinCount.text, out amount)) {
+			if (amount >= pay) {
+				if ((email.text != null)) {
 
-			var headers = form.headers;
-			form.headers["content-type"] = "application/x-www-form-urlencoded";
+					WWWForm form = new WWWForm ();
+					form.AddField ("name", name.text);
+					form.AddField ("email", email.text);
+					form.AddField ("reqAmount", pay + "");
+					form.AddField ("payType", "paypal");
+					form.AddField ("amount", coinCount.text);
 
-			WWW www = new WWW (base_url + "userAdd", form);
-			yield return www;
+					var headers = form.headers;
+					form.headers["content-type"] = "application/x-www-form-urlencoded";
+
+					WWW www = new WWW (base_url + "userAdd", form);
+					yield return www;
 
 
-			if (www.error != null) {
-				pleaseWaitText.text = www.error;
-				pleaseWaitButton.interactable = true;
-				Debug.Log (www.error);
+					if (www.error != null) {
+						pleaseWaitText.text = www.error;
+						pleaseWaitButton.interactable = true;
+						Debug.Log (www.error);
 
-			} else {
+					} else {
 
-				print (www.text);
-				pleaseWaitText.text = "Success";
-				pleaseWaitButton.interactable = true;
+						print (www.text);
+						pleaseWaitText.text = "Success";
+						pleaseWaitButton.interactable = true;
+					}
+				}
 			}
+
 			/*
 			user user;
 			string json = www.downloadHandler.text;
@@ -75,8 +82,9 @@ public class Payment : MonoBehaviour {
 				*/
 		} else {
 			pleaseWaitText.text = "Data invalid...";
-			pleaseWaitButton.interactable = true;
+
 		}
+		pleaseWaitButton.interactable = true;
 		yield break;
 	}
 

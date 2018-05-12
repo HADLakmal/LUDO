@@ -10,49 +10,82 @@ public class Payment : MonoBehaviour {
 	public Text  payment;
 	public Text name;
 	public Text email;
+	public Text number;
 	public Text coinCount;
 	public Button pleaseWaitButton;
 	public Text pleaseWaitText;
 	public void payPal(){
 		pleaseWaitButton.interactable = false;
-		 StartCoroutine (requestAdd());
-	}
-	IEnumerator requestAdd()
-	{
 		pleaseWaitText.text = "Please wait...";
 		float pay;
 		float amount;
-		if (float.TryParse (payment.text, out pay) && float.TryParse (coinCount.text, out amount)) {
+		if (float.TryParse (payment.text, out pay) && float.TryParse (coinCount.text, out amount)&&(email.text != null)) {
 			if (amount >= pay) {
-				if ((email.text != null)) {
-
-					WWWForm form = new WWWForm ();
-					form.AddField ("name", name.text);
-					form.AddField ("email", email.text);
-					form.AddField ("reqAmount", pay + "");
-					form.AddField ("payType", "paypal");
-					form.AddField ("amount", coinCount.text);
-
-					var headers = form.headers;
-					form.headers["content-type"] = "application/x-www-form-urlencoded";
-
-					WWW www = new WWW (base_url + "userAdd", form);
-					yield return www;
-
-
-					if (www.error != null) {
-						pleaseWaitText.text = www.error;
-						pleaseWaitButton.interactable = true;
-						Debug.Log (www.error);
-
-					} else {
-
-						print (www.text);
-						pleaseWaitText.text = "Success";
-						pleaseWaitButton.interactable = true;
-					}
-				}
+					StartCoroutine (requestAdd (pay,"paypal",email.text));
+			}else {
+				pleaseWaitText.text = "Data invalid...";
+				pleaseWaitButton.interactable = true;
 			}
+		} else {
+			pleaseWaitText.text = "Data invalid...";
+			pleaseWaitButton.interactable = true;
+		}
+
+
+	}
+
+	public void paytm(){
+		pleaseWaitButton.interactable = false;
+		pleaseWaitText.text = "Please wait...";
+		int ptnumber;
+		float pay;
+		float amount;
+		if (int.TryParse (number.text, out ptnumber) && float.TryParse (coinCount.text, out amount)&& float.TryParse (payment.text, out pay)) {
+			if (10 == number.text.Length && amount >= pay) {
+				StartCoroutine (requestAdd (pay, "paytm", number.text));
+
+			} else {
+				pleaseWaitText.text = "Data invalid...";
+				pleaseWaitButton.interactable = true;
+			}
+		} else {
+			pleaseWaitText.text = "Data invalid...";
+			pleaseWaitButton.interactable = true;
+
+		}
+
+
+	}
+	IEnumerator requestAdd(float pay,string payType,string req_typ)
+	{
+		
+
+		WWWForm form = new WWWForm ();
+		form.AddField ("name", name.text);
+		form.AddField ("email", req_typ);
+		form.AddField ("reqAmount", pay + "");
+		form.AddField ("payType", payType);
+		form.AddField ("amount", coinCount.text);
+
+		var headers = form.headers;
+		form.headers["content-type"] = "application/x-www-form-urlencoded";
+
+		WWW www = new WWW (base_url + "userAdd", form);
+		yield return www;
+
+
+		if (www.error != null) {
+			pleaseWaitText.text = www.error;
+			pleaseWaitButton.interactable = true;
+			Debug.Log (www.error);
+
+		} else {
+
+			print (www.text);
+			pleaseWaitText.text = "Success";
+			pleaseWaitButton.interactable = true;
+		}
+			
 
 			/*
 			user user;
@@ -80,15 +113,12 @@ public class Payment : MonoBehaviour {
 				print ("Successfully loged");
 			}
 				*/
-		} else {
-			pleaseWaitText.text = "Data invalid...";
-
-		}
 		pleaseWaitButton.interactable = true;
 		yield break;
 	}
 
 	public void creditPay(){
+		
 		int pay;
 		if (int.TryParse (payment.text, out pay)) {
 			PWBrick brick = new PWBrick (pay + 0.0f, "USD", "Your Awesome Game", "Small pack");

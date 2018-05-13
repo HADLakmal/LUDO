@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public class Payment : MonoBehaviour {
 
-	string base_url = "http://139.59.6.58:3000/";
+
 	public Text  payment;
 	public Text name;
 	public Text email;
@@ -70,7 +70,7 @@ public class Payment : MonoBehaviour {
 		var headers = form.headers;
 		form.headers["content-type"] = "application/x-www-form-urlencoded";
 
-		WWW www = new WWW (base_url + "userAdd", form);
+		WWW www = new WWW (BaseURL.base_url + "userAdd", form);
 		yield return www;
 
 
@@ -128,4 +128,7 @@ public class Payment : MonoBehaviour {
 		}
 	
 	}
+
+
+
 }
